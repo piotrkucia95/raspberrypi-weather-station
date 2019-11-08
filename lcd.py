@@ -1,5 +1,6 @@
-import RPi.GPIO as GPIO
 import time
+import RPi.GPIO as GPIO
+import bme280
 
 # Define GPIO to LCD mapping
 LCD_RS = 26
@@ -36,13 +37,30 @@ def main():
   GPIO.output(LED_ON, True)
   time.sleep(1)
 
-  # Send some right justified text
-  lcd_byte(LCD_LINE_1, LCD_CMD)
-  lcd_string("WORKS FINE",1)
-  # lcd_byte(LCD_LINE_2, LCD_CMD)
-  # lcd_string(".co.uk",3)
+  while True:
+    temperature,pressure,humidity = bme280.readBME280All()
 
-  time.sleep(30)
+    # Send some right justified text
+    lcd_byte(LCD_LINE_1, LCD_CMD)
+    lcd_string("Tempera.: " + str("{:.1f}".format(temperature)) + "C" ,1)
+    lcd_byte(LCD_LINE_2, LCD_CMD)
+    lcd_string("Pressure: " + str("{:.1f}".format(pressure)) + "hPa",1)
+    
+    time.sleep(2)
+    
+    lcd_byte(LCD_LINE_1, LCD_CMD)
+    lcd_string("Pressure: " + str("{:.1f}".format(pressure)) + "hPa",1)
+    lcd_byte(LCD_LINE_2, LCD_CMD)
+    lcd_string("Humidity: " + str("{:.1f}".format(humidity)) + "%",1)
+    
+    time.sleep(2)
+    
+    lcd_byte(LCD_LINE_1, LCD_CMD)
+    lcd_string("Humidity: " + str("{:.1f}".format(humidity)) + "%",1)
+    lcd_byte(LCD_LINE_2, LCD_CMD)
+    lcd_string("Tempera.: " + str("{:.1f}".format(temperature))+ "C",1)
+    
+    time.sleep(2)
 
   # Turn off backlight
   GPIO.output(LED_ON, False)
