@@ -1,6 +1,9 @@
+# -*- coding: UTF-8 -*-
+
 import time
 import RPi.GPIO as GPIO
 import bme280
+import serial, time, struct, array
 
 # Define GPIO to LCD mapping
 LCD_RS = 26
@@ -36,31 +39,73 @@ def main():
   time.sleep(1)
   GPIO.output(LED_ON, True)
   time.sleep(1)
+  
+  ser = serial.Serial()
+  ser.port = "/dev/ttyUSB0" # Set this to your serial port
+  ser.baudrate = 9600
 
-  while True:
+  ser.open()
+  ser.flushInput()
+
+  byte, lastbyte = "\x00", "\x00"
+  cnt = 0
+
+  while True:  
     temperature,pressure,humidity = bme280.readBME280All()
+    
+    lastbyte = byte
+    byte = ser.read(size=1)
+    
+    if lastbyte == "\xAA" and byte == "\xC0":
+        sentence = ser.read(size=8)
+        readings = struct.unpack('<hhxxcc',sentence)
 
-    # Send some right justified text
-    lcd_byte(LCD_LINE_1, LCD_CMD)
-    lcd_string("Tempera.: " + str("{:.1f}".format(temperature)) + "C" ,1)
-    lcd_byte(LCD_LINE_2, LCD_CMD)
-    lcd_string("Pressure: " + str("{:.1f}".format(pressure)) + "hPa",1)
+        pm_25 = readings[0]/10.0
+        pm_10 = readings[1]/10.0
+        
+        if (cnt == 0 ):
+            # line = "PM 2.5: {} μg/m^3  PM 10: {} μg/m^3".format(pm_25, pm_10)
+            # print(datetime.now().strftime("%d %b %Y %H:%M:%S.%f: ")+line)
+            
+            # Send some right justified text
+            lcd_byte(LCD_LINE_1, LCD_CMD)
+            lcd_string("Temperature:", 1)
+            lcd_byte(LCD_LINE_2, LCD_CMD)
+            lcd_string(str("{:.1f}".format(temperature)) + " " + chr(223) + "C",3)
     
-    time.sleep(2)
+            time.sleep(2)
     
-    lcd_byte(LCD_LINE_1, LCD_CMD)
-    lcd_string("Pressure: " + str("{:.1f}".format(pressure)) + "hPa",1)
-    lcd_byte(LCD_LINE_2, LCD_CMD)
-    lcd_string("Humidity: " + str("{:.1f}".format(humidity)) + "%",1)
+            lcd_byte(LCD_LINE_1, LCD_CMD)
+            lcd_string("Pressure:", 1)
+            lcd_byte(LCD_LINE_2, LCD_CMD)
+            lcd_string(str("{:.1f}".format(pressure)) + " hPa", 3)
     
-    time.sleep(2)
+            time.sleep(2)
     
-    lcd_byte(LCD_LINE_1, LCD_CMD)
-    lcd_string("Humidity: " + str("{:.1f}".format(humidity)) + "%",1)
-    lcd_byte(LCD_LINE_2, LCD_CMD)
-    lcd_string("Tempera.: " + str("{:.1f}".format(temperature))+ "C",1)
+            lcd_byte(LCD_LINE_1, LCD_CMD)
+            lcd_string("Humidity:", 1)
+            lcd_byte(LCD_LINE_2, LCD_CMD)
+            lcd_string(str("{:.1f}".format(humidity)) + " %", 3)
     
-    time.sleep(2)
+            time.sleep(2)
+    
+            lcd_byte(LCD_LINE_1, LCD_CMD)
+            lcd_string("PM 2,5:", 1)
+            lcd_byte(LCD_LINE_2, LCD_CMD)
+            lcd_string(str("{:.1f}".format(pm_25)) + " ug/m^3", 3)
+    
+            time.sleep(2)
+    
+            lcd_byte(LCD_LINE_1, LCD_CMD)
+            lcd_string("PM 10:", 1)
+            lcd_byte(LCD_LINE_2, LCD_CMD)
+            lcd_string(str("{:.1f}".format(pm_10)) + " ug/m^3", 3)
+    
+            time.sleep(2)
+            
+        cnt += 1
+        if (cnt == 5):
+            cnt = 0
 
   # Turn off backlight
   GPIO.output(LED_ON, False)
