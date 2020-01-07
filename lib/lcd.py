@@ -2,8 +2,6 @@
 
 import time
 import RPi.GPIO as GPIO
-import bme280
-import serial, time, struct, array
 
 # Define GPIO to LCD mapping
 LCD_RS = 26
@@ -26,6 +24,7 @@ LCD_LINE_2 = 0xC0 # LCD RAM address for the 2nd line
 E_PULSE = 0.00005
 E_DELAY = 0.00005
 
+"""
 def main():
   # Main program block
 
@@ -109,6 +108,8 @@ def main():
 
   # Turn off backlight
   GPIO.output(LED_ON, False)
+"""
+
 
 def lcd_init():
   GPIO.setmode(GPIO.BCM)       # Use BCM GPIO numbers
