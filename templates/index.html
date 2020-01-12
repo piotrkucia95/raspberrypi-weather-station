@@ -7,12 +7,15 @@
     <title>Raspberry Pi weather station</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" type="text/css"/>
-
-    <script src="main.js"></script>
 </head>
 <body>
     
-    XDDDD
+    Temperature: {{ temperature }} &deg;C <br/>
+    Pressure: {{ pressure }} hPa <br/>
+    Humidity: {{ humidity }} % <br/>
+    PM25: {{ pm25 }} &micro;g/m&sup3; <br/>
+    PM10: {{ pm10 }} &micro;g/m&sup3; <br/><br/>
+    <a href="/history/5">Weather history</a>
 
 </body>
 </html>

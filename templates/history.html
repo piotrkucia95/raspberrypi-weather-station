@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Raspberry Pi weather station</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" type="text/css"/>
+</head>
+<body>
+    Results displayed:
+    <a href="/history/5">5</a> | <a href="/history/10">10</a> |
+    <a href="/history/20">20</a> | <a href="/history/50">50</a> |
+    <a href="/history/100">100</a>
+    <br/><br/>
+    
+    {% for result in results %}
+        Date: {{ result[1].strftime('%d.%m.%Y') }} <br/>
+        Time: {{ result[1].strftime('%H:%M:%S') }} <br/>
+        Temperature: {{ result[2] }} &deg;C <br/>
+        Pressure: {{ result[3] }} hPa <br/>
+        Humidity: {{ result[4] }} % <br/>
+        PM25: {{ result[5] }} &micro;g/m&sup3; <br/>
+        PM10: {{ result[6] }} &micro;g/m&sup3; <br/><br/>
+    {% endfor %}
+    <a href="/">Home page</a>
+
+</body>
+</html>

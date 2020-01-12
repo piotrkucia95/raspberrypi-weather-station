@@ -1,9 +1,7 @@
 # -*- coding: UTF-8 -*-
-
-from lib import bme280
 import serial, time, struct, array
 
-def get_values():
+def get_airquality():
     ser = serial.Serial()
     ser.port = "/dev/ttyUSB0" # Set this to your serial port
     ser.baudrate = 9600
@@ -14,9 +12,7 @@ def get_values():
     byte, lastbyte = "\x00", "\x00"
     cnt = 0
     
-    while True:  
-        temperature,pressure,humidity = bme280.readBME280All()
-        
+    while True:     
         lastbyte = byte
         byte = ser.read(size=1)
         
@@ -28,7 +24,7 @@ def get_values():
             pm_10 = readings[1]/10.0
             
             if (cnt == 0 ):
-                return [temperature, pressure, humidity, pm_25, pm_10];
+                return [pm_25, pm_10];
                 
             cnt += 1
             if (cnt == 5):
