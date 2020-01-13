@@ -34,7 +34,10 @@ class Server:
         self.app.run('0.0.0.0')
         
     def get_latest_data(self, number_of_rows):
-        self.db_cursor.execute("SELECT * FROM `weather-data` ORDER BY date DESC LIMIT %s" % number_of_rows)
+        if (number_of_rows == 'all'):
+            self.db_cursor.execute("SELECT * FROM `weather-data` ORDER BY date DESC")
+        else:
+            self.db_cursor.execute("SELECT * FROM `weather-data` ORDER BY date DESC LIMIT %s" % number_of_rows)
         return self.db_cursor.fetchall()
     
     def save_to_db(self, data):

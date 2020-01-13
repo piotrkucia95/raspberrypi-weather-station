@@ -9,13 +9,14 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" type="text/css"/>
 </head>
 <body>
-    
-    Temperature: {{ temperature }} &deg;C <br/>
-    Pressure: {{ pressure }} hPa <br/>
-    Humidity: {{ humidity }} % <br/>
-    PM25: {{ pm25 }} &micro;g/m&sup3; <br/>
-    PM10: {{ pm10 }} &micro;g/m&sup3; <br/><br/>
-    <a href="/history/5">Weather history</a>
-
+    <div class="p-3">
+        <div class="pb-2"><b>Temperature</b>: {{ temperature }} &deg;C </div>
+        <div class="pb-2"><b>Pressure</b>: {{ pressure }} hPa </div>
+        <div class="pb-2"><b>Humidity</b>: {{ humidity }} % </div>
+        <div class="pb-2"><b>PM25</b>: {{ pm25 }} &micro;g/m&sup3; </div>
+        <div class="pb-2"><b>PM10</b>: {{ pm10 }} &micro;g/m&sup3; </div>
+        <br/>
+        <a href="/history/5">Weather history</a>
+    </div>
 </body>
 </html>
