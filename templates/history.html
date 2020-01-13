@@ -6,9 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Raspberry Pi weather station</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" type="text/css"/>
-
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script 
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" type="text/css"/> 
 </head>
 <body>
     <div class="p-3">
@@ -47,10 +45,139 @@
                 {% endfor %}
             </tbody>
         </table>
+        <br/>
         
+        <div class="col-md-6 col-sm-8 col-xs-12" style="text-align: center; margin: 0 auto;">
+        
+            <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+            <br/>
+            
+            <div class="btn-group btn-group-toggle" data-toggle="buttons" style="text-align: center;">
+              <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="temperature" autocomplete="off" checked onclick="changeChart(this);"> Temperature
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="pressure" autocomplete="off" onclick="changeChart(this);"> Pressure
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="humidity" autocomplete="off" onclick="changeChart(this);"> Humidity
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="pm25" autocomplete="off" onclick="changeChart(this);"> PM2,5
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="pm10" autocomplete="off" onclick="changeChart(this);"> PM10
+              </label>
+            </div>
+        </div>
+        <br/>
         <a href="/">Home page</a>
         
     </div>
     
+    <script>
+        var dates = [];
+        var temps = [];
+        var press = [];
+        var hums = [];
+        var pm25 = [];
+        var pm10 = [];
+        {% for result in results %}
+            dates.push(new Date('{{ result[1] }}'));
+            temps.push({{ result[2] }});
+            press.push({{ result[3] }});
+            hums.push({{ result[4] }});
+            pm25.push({{ result[5] }});
+            pm10.push({{ result[6] }});
+        {% endfor %}
+        
+        function changeChart(element) {
+            var data;
+            switch(element.id) {
+                case 'temperature':
+                    data = createChartPoints(temps);
+                    updateChart('Temperature', 0, "Temperature [°C]", data);
+                    break;
+                case 'pressure':
+                    data = createChartPoints(press);
+                    updateChart('Pressure', 950, "Pressure [hPa]", data);
+                    break;
+                case 'humidity':
+                    data = createChartPoints(hums);
+                    updateChart('Humidity', 0, "Humidity [%]", data);
+                    break;
+                case 'pm25':
+                    data = createChartPoints(pm25);
+                    updateChart('PM2,5', 0, "PM2,5 [µg/m³]", data);
+                    break;
+                case 'pm10':
+                    data = createChartPoints(pm10);
+                    updateChart('PM10', 0, "PM10 [µg/m³]", data);
+                    break;
+                default:
+                    break; 
+            }
+        }
+        
+        function formatDate(date) {
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var ampm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            var strTime = hours + ':' + minutes + ' ' + ampm;
+            return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+        }
+
+        
+        function createChartPoints(list) {
+            var data = [];
+            for (var i=0; i<list.length; i++) {
+                data.push({
+                    label: formatDate(dates[i]),
+                    x: dates[i],
+                    y: list[i]
+                });
+            }
+            return data;
+        }
+        
+        function updateChart(title, axisMinimum, axisTitle, data) {
+            chart.options.data[0].dataPoints = data;
+            chart.options.axisY.title = axisTitle;
+            chart.options.axisY.minimum = axisMinimum;
+            chart.options.title.text = title;
+            chart.render();
+        }
+        
+        var chart;
+        window.onload = function () {
+            tempPoints = createChartPoints(temps);
+            chart = new CanvasJS.Chart("chartContainer", {
+                    theme: "light1",
+                    animationEnabled: true,
+                    axisX: {      
+                        labelAngle: -50
+                    },
+                    axisY:{
+                        title: "Temperature [°C]",
+                    },
+                    title:{
+                            text: "Temperature"
+                    },
+                    data: [
+                    {
+                            type: "spline",
+                            dataPoints: tempPoints
+                    }
+                    ]
+            });
+            chart.render();
+        }
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"> </script>
 </body>
 </html>

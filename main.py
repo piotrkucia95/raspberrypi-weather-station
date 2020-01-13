@@ -10,7 +10,7 @@ def main_loop():
     while True:
         now = datetime.datetime.now()
         if (latest_measure[1].hour != now.hour):
-            measure_time = datetime.datetime(now.year, now.month, now.day, now.hour, 0, 0)
+            measure_time = now
             latest_measure = [1, measure_time, weather.temperature, weather.pressure, weather.humidity, weather.pm25, weather.pm10]
             server.save_to_db(latest_measure)
         
